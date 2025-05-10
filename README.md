@@ -27,7 +27,7 @@ Run the following command to install the necessary dependencies
 go install
 ```
 
-After that, run this command to create a .env file with which youcan get started with.
+After that, run this command to create a .env file with which you can get started with.
 
 ```bash
 bash setup.sh

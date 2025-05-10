@@ -40,7 +40,7 @@ func CreateURL(c *fiber.Ctx) error {
 	err = config.MongoDatabase.Collection("urls").FindOne(context.TODO(), filter).Decode(&url)
 	
 	if err == nil {
-		shortURL := fmt.Sprintf("%s/%s", config.Config("SERVER_URL"), url.ShortURL)
+		shortURL := fmt.Sprintf("%s/%s", config.Config("URL_ABSOLUTE_URL"), url.ShortURL)
 
 		return helpers.RespondWithError(c, fiber.StatusBadRequest, fmt.Sprintf("URL has already been shortened: %s", shortURL))
 	} else if err != mongo.ErrNoDocuments {
