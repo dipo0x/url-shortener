@@ -10,7 +10,7 @@ This is a RESTful API built using Golang, Fiber, MongoDB, Redis, Async and Refle
 Clone the repository to your local machine.
 
 ```bash
-git clone https://github.com/dipo0x/golang-url-shortener
+git clone https://github.com/dipo0x/url-shortener
 ```
 
 Ensure that you have Golang, Redis and MongoDB installed on your machine. Alternatively, you can use MongoDB Cloud Atlas and Redis cloud service
@@ -18,7 +18,7 @@ Ensure that you have Golang, Redis and MongoDB installed on your machine. Altern
 Navigate to the root directory of the project in a terminal.
 
 ```bash
-cd golang-url-shortener
+cd url-shortener
 ```
 
 Run the following command to install the necessary dependencies
@@ -32,8 +32,6 @@ After that, run this command to create a .env file with which you can get starte
 ```bash
 bash setup.sh
 ```
-
-</br>
 
 ### Running Server
 
@@ -62,7 +60,7 @@ The server will run on http://localhost:8080 by default
 
 </br>
 
-### Setup
+### Test
 To test the endpoints, run this command :
 ```bash
 go test ./test/
