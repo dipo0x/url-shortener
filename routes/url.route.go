@@ -7,4 +7,5 @@ import (
 
 func URLRoutes(router fiber.Router) {
     router.Post("/create-url", controller.CreateURL)
+    router.Get("/:id", controller.RedirectURL)
 }

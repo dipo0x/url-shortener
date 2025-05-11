@@ -90,3 +90,21 @@ func CreateURL(c *fiber.Ctx) error {
 		"data":    urlData,
 	})
 }
+
+func RedirectURL(c *fiber.Ctx) error {
+	var url models.URL
+	var err error
+
+	id := c.Params("id")
+
+	filter := bson.M{"shortURL": id}
+	err = config.MongoDatabase.Collection("urls").FindOne(context.TODO(), filter).Decode(&url)
+	
+	if err == mongo.ErrNoDocuments {
+		return helpers.RespondWithError(c, fiber.StatusNotFound, "Short URL not found")
+	} else if err != nil {
+		return helpers.RespondWithError(c, fiber.StatusInternalServerError, "Database error")
+	}
+
+	return c.Redirect(url.URL, fiber.StatusMovedPermanently)
+}
