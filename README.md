@@ -53,6 +53,7 @@ asynqmon --redis-addr=localhost:6379
 <img width="612" alt="Screenshot 2025-05-10 at 11 17 00 PM" src="https://github.com/user-attachments/assets/56d6a976-d511-459a-abc4-919605b575db" />
 
 and when you run your asynqmon start command, you will see this:
+</br>
 <img width="470" alt="Screenshot 2025-05-10 at 11 19 39 PM" src="https://github.com/user-attachments/assets/b430595e-83a0-4d78-a541-f9c3aa7de20f" />
 
 
@@ -60,6 +61,22 @@ and when you run your asynqmon start command, you will see this:
 The server will run on http://localhost:8080 by default
 
 </br>
+
+### Setup
+To test the endpoints, run this command :
+```bash
+go test ./test/
+```
+If all your tests are successful, you will see this: 
+</br>
+<img width="398" alt="Screenshot 2025-05-11 at 5 47 47 PM" src="https://github.com/user-attachments/assets/f5da7bff-1351-48d0-9931-d65ec361085e" />
+
+</br>
+else, you will see something similar to this:
+</br>
+<img width="418" alt="Screenshot 2025-05-11 at 5 47 01 PM" src="https://github.com/user-attachments/assets/63ccc3cc-cf5b-46f5-a383-c02c1d8c9e24" />
+
+
 
 ## Available Endpoints
 
