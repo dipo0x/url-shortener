@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"github.com/dipo0x/golang-url-shortener/config"
-	"github.com/dipo0x/golang-url-shortener/types"
+
+	"github.com/dipo0x/golang-url-shortener/internal/config"
+	"github.com/dipo0x/golang-url-shortener/internal/types"
+	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 	"go.mongodb.org/mongo-driver/bson"
-	"github.com/google/uuid"
 )
 
 const (
@@ -19,13 +20,13 @@ func main() {
 	if err := config.InitializeMongoDB(config.Config("MONGO_URI"), config.Config("MONGO_DATABASE")); err != nil {
 		log.Fatalf("MongoDB connection failed: %v", err)
 	}
-	
+
 	srv := asynq.NewServer(
 		asynq.RedisClientOpt{Addr: config.Config("REDIS_URL")},
 		asynq.Config{
 			Concurrency: 10,
 			Queues: map[string]int{
-				"default": 6,
+				"default":  6,
 				"critical": 4,
 			},
 		},

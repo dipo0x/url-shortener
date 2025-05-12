@@ -2,9 +2,10 @@ package jobs
 
 import (
 	"encoding/json"
-	"github.com/dipo0x/golang-url-shortener/types"
-	"github.com/hibiken/asynq"
+
+	"github.com/dipo0x/golang-url-shortener/internal/types"
 	"github.com/google/uuid"
+	"github.com/hibiken/asynq"
 )
 
 const (

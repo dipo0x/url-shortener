@@ -6,7 +6,7 @@ import (
 	"log"
 	"encoding/hex"
 	"context"
-	"github.com/dipo0x/golang-url-shortener/config"
+	"github.com/dipo0x/golang-url-shortener/internal/config"
 )
 
 func generateRandomString() string {
