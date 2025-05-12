@@ -10,7 +10,7 @@ import (
 
 func TestCreateURLSuccess(t *testing.T) {
     payload := map[string]string{
-        "url":       "https://github.com/dipo0x",
+        "url":       "https://github.com/dipo0",
         "expiresAt": "24",
     }
     body, _ := json.Marshal(payload)
@@ -33,7 +33,7 @@ func TestCreateURLSuccess(t *testing.T) {
 
 func TestCreateURLFailure(t *testing.T) {
     payload := map[string]string{
-        "url": "https://github.com/dipo0x",
+        "url": "https://github.com/dipo0",
     }
     body, _ := json.Marshal(payload)
 

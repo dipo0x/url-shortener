@@ -24,7 +24,7 @@ func InitializeApp() *fiber.App {
 	}
 
 	go func() {
-		cmd := exec.Command("go", "run", "workers/redis.worker.go")
+		cmd := exec.Command("go", "run", "workers/redis_worker.go")
 		cmd.Stdout = log.Writer()
 		cmd.Stderr = log.Writer()
 		if err := cmd.Start(); err != nil {
