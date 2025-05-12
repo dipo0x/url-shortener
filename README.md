@@ -63,7 +63,7 @@ The server will run on http://localhost:8080 by default
 ### Test
 To test the endpoints, run this command :
 ```bash
-go test ./test/
+go test ./tests/
 ```
 If all your tests are successful, you will see this: 
 </br>
