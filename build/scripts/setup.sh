@@ -5,13 +5,9 @@ echo "Enter server post (default: localhost:8080):"
 read -r PORT
 PORT=${PORT:-localhost:8080}
 
-echo "Enter database host (default: mongodb://localhost:27017/?connect=direct):"
-read -r MONGO_URI
-MONGO_URI=${MONGO_URI:-mongodb://localhost:27017/?connect=direct}
-
-echo "Enter database name (default: golang-url-shortener):"
-read -r MONGO_DATABASE
-MONGO_DATABASE=${MONGO_DATABASE:-golang-url-shortener}
+echo "Enter database host (default: golang-url-shortener):"
+read -r DATABASE_URL
+DATABASE_URL=${DATABASE_URL:-golang-url-shortener}
 
 echo "Enter jwt secret key (default: 1D@Gz3d7P!nK*I#T8rE$F3m9L&vJq%W):"
 read -r JWT_SECRET_KEY
@@ -28,8 +24,7 @@ REDIS_URL=${REDIS_URL:-localhost:6379}
 # Create the .env file
 cat <<EOF > .env
 PORT=$PORT
-MONGO_URI=$MONGO_URI
-MONGO_DATABASE=$MONGO_DATABASE
+DATABASE_URL=$DATABASE_URL
 JWT_SECRET_KEY=$JWT_SECRET_KEY
 URL_ABSOLUTE_URL=$URL_ABSOLUTE_URL
 REDIS_URL=$REDIS_URL

@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"go.mongodb.org/mongo-driver/bson"
+
 	"crypto/rand"
 	"log"
 	"encoding/hex"
@@ -10,7 +10,7 @@ import (
 )
 
 func generateRandomString() string {
-	bytes := make([]byte, 5) // 5 bytes = 10 hex characters
+	bytes := make([]byte, 5)
 	_, err := rand.Read(bytes)
 	if err != nil {
 		log.Fatal(err)
@@ -20,9 +20,14 @@ func generateRandomString() string {
 
 func GetUniqueRandomString() (string, error) {
 	for {
+		var count int
 		randomString := generateRandomString()
 
-		count, err := config.MongoDatabase.Collection("urls").CountDocuments(context.TODO(), bson.M{"randomField": randomString})
+		err := config.Pool.QueryRow(
+		context.Background(),
+		`SELECT COUNT(*) FROM urls WHERE short_url = $1`,
+		randomString,
+	).Scan(&count)
 		if err != nil {
 			return "", err
 		}

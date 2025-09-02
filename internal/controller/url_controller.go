@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 	"time"
-
 	"github.com/dipo0x/golang-url-shortener/api"
 	"github.com/dipo0x/golang-url-shortener/helpers"
 	"github.com/dipo0x/golang-url-shortener/internal/config"
@@ -16,14 +15,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/jackc/pgx/v5"
+
 )
+
+var ctx = context.Background()
 
 func CreateURL(c *fiber.Ctx) error {
 	var body types.IURL
-	var url models.URL
+	// var url models.URL
 
 	if err := c.BodyParser(&body); err != nil {
 		return api.RespondWithError(c, fiber.StatusBadRequest, "Invalid request payload")
@@ -35,18 +35,19 @@ func CreateURL(c *fiber.Ctx) error {
 
 	shortURL, err := helpers.GetUniqueRandomString()
 	if err != nil {
+		log.Fatal(err)
 		return api.RespondWithError(c, fiber.StatusInternalServerError, "Failed to generate short URL")
 	}
 
-	filter := bson.M{"url": body.URL}
-	err = config.MongoDatabase.Collection("urls").FindOne(context.TODO(), filter).Decode(&url)
+	var url_short_form string
+	err = config.Pool.QueryRow(ctx, `
+		SELECT short_url FROM urls WHERE url = $1 LIMIT 1
+	`, body.URL).Scan(&url_short_form)
 
 	if err == nil {
-		shortURL := fmt.Sprintf("%s/%s", config.Config("URL_ABSOLUTE_URL"), url.ShortURL)
+		shortURL := fmt.Sprintf("%s/%s", config.Config("URL_ABSOLUTE_URL"), url_short_form)
 
 		return api.RespondWithError(c, fiber.StatusBadRequest, fmt.Sprintf("URL has already been shortened: %s", shortURL))
-	} else if err != mongo.ErrNoDocuments {
-		return api.RespondWithError(c, fiber.StatusInternalServerError, "Database error")
 	}
 
 	hours, err := time.ParseDuration(body.ExpiresAt + "h")
@@ -56,15 +57,22 @@ func CreateURL(c *fiber.Ctx) error {
 
 	urlId := uuid.New()
 
-	urlData := models.URL{
-		ID:        urlId,
-		ShortURL:  shortURL,
-		URL:       body.URL,
-		ExpiresAt: primitive.NewDateTimeFromTime(time.Now().Add(hours)),
-		Clicks:    0,
-	}
+	var savedURL models.URL
 
-	_, err = config.MongoDatabase.Collection("urls").InsertOne(context.Background(), urlData)
+	err = config.Pool.QueryRow(ctx, `
+    INSERT INTO urls (url, short_url, clicks, expires_at)
+    VALUES ($1, $2, $3, $4)
+    RETURNING id, url, short_url, clicks, expires_at, created_at, updated_at
+`, body.URL, shortURL, 0, time.Now().Add(hours)).Scan(
+    &savedURL.ID,
+    &savedURL.URL,
+    &savedURL.ShortURL,
+    &savedURL.Clicks,
+    &savedURL.ExpiresAt,
+    &savedURL.CreatedAt,
+    &savedURL.UpdatedAt,
+)
+
 	if err != nil {
 		return api.RespondWithError(c, fiber.StatusInternalServerError, "Failed to save URL")
 	}
@@ -83,30 +91,34 @@ func CreateURL(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 	if _, err := asynqClient.Enqueue(task, asynq.ProcessIn(delay)); err != nil {
+		log.Fatal(err)
 		return fiber.ErrInternalServerError
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"status":  200,
+		"status": 200,
 		"success": true,
-		"data":    urlData,
+		"data": savedURL,
 	})
 }
 
 func RedirectURL(c *fiber.Ctx) error {
-	var url models.URL
-	var err error
-
 	id := c.Params("id")
+	var originalURL string
 
-	filter := bson.M{"shortURL": id}
-	err = config.MongoDatabase.Collection("urls").FindOne(context.TODO(), filter).Decode(&url)
+    err := config.Pool.QueryRow(ctx, `
+        UPDATE urls
+        SET clicks = clicks + 1, updated_at = NOW()
+        WHERE short_url = $1
+        RETURNING url
+    `, id).Scan(&originalURL)
 
-	if err == mongo.ErrNoDocuments {
-		return api.RespondWithError(c, fiber.StatusNotFound, "Short URL not found")
-	} else if err != nil {
-		return api.RespondWithError(c, fiber.StatusInternalServerError, "Database error")
-	}
+    if err != nil {
+        if err == pgx.ErrNoRows {
+            return api.RespondWithError(c, fiber.StatusInternalServerError, "URL not found")
+        }
+    }
 
-	return c.Redirect(url.URL, fiber.StatusMovedPermanently)
+	return c.Redirect(originalURL, fiber.StatusMovedPermanently)
 }
+

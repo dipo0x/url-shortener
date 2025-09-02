@@ -17,7 +17,7 @@ const (
 )
 
 func main() {
-	if err := config.InitializeMongoDB(config.Config("MONGO_URI"), config.Config("MONGO_DATABASE")); err != nil {
+	if err := config.InitializeDB(config.Config("DATABASE_URL")); err != nil {
 		log.Fatalf("MongoDB connection failed: %v", err)
 	}
 
@@ -41,11 +41,11 @@ func main() {
 		objID, _ := uuid.Parse(p.DocumentID)
 		filter := bson.M{"_id": objID}
 		log.Println(objID, filter)
-		_, err := config.MongoDatabase.Collection("urls").DeleteOne(context.TODO(), filter)
-		if err != nil {
-			log.Println("Delete error:", err)
-			return err
-		}
+		// _, err := config.MongoDatabase.Collection("urls").DeleteOne(context.TODO(), filter)
+		// if err != nil {
+		// 	log.Println("Delete error:", err)
+		// 	return err
+		// }
 		return nil
 	})
 	if err := srv.Run(mux); err != nil {

@@ -30,7 +30,7 @@ go install
 After that, run this command to create a .env file with which you can get started with.
 
 ```bash
-bash setup.sh
+bash build/scripts/setup.sh
 ```
 
 ### Running Server

@@ -2,46 +2,33 @@ package config
 
 import (
 	"context"
-	"fmt"
-	"log"
-	"time"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+    "fmt"
+    "log"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 )
 
-var MongoClient *mongo.Client
-var MongoDatabase *mongo.Database
+var Pool *pgxpool.Pool
+var ctx = context.Background()
 
-func InitializeMongoDB(uri, dbName string) error {
-	clientOptions := options.Client().ApplyURI(uri)
+func InitializeDB(uri string) error {
+    var err error
+    Pool, err = pgxpool.New(ctx, uri)
+    if err != nil {
+        log.Fatal("Unable to connect to database:", err)
+    }
 
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		return fmt.Errorf("failed to create MongoDB client: %w", err)
-	}
+    if err := Pool.Ping(ctx); err != nil {
+        log.Fatal("Unable to ping database:", err)
+    }
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("failed to ping MongoDB: %w", err)
-	}
-
-	MongoClient = client
-	MongoDatabase = client.Database(dbName)
-
-	log.Println("Connected to MongoDB successfully")
+    fmt.Println("Connected to PostgreSQL database!")
 	return err
 }
 
-func DisconnectMongoDB() {
-	if MongoClient != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := MongoClient.Disconnect(ctx); err != nil {
-			log.Fatalf("Failed to disconnect MongoDB client: %v", err)
-		}
-		log.Println("Disconnected from MongoDB successfully")
-	}
+func DisconnectDB() {
+    if Pool != nil {
+        Pool.Close()
+        fmt.Println("Disconnected from PostgreSQL database.")
+    }
 }
