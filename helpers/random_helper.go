@@ -1,7 +1,6 @@
 package helpers
 
 import (
-
 	"crypto/rand"
 	"log"
 	"encoding/hex"

@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strconv"
+
 	"time"
 	"github.com/dipo0x/golang-url-shortener/api"
 	"github.com/dipo0x/golang-url-shortener/helpers"
 	"github.com/dipo0x/golang-url-shortener/internal/config"
 	"github.com/dipo0x/golang-url-shortener/internal/models"
 	"github.com/dipo0x/golang-url-shortener/internal/types"
-	"github.com/dipo0x/golang-url-shortener/jobs"
+	"github.com/dipo0x/golang-url-shortener/workers/rabbitmq"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/hibiken/asynq"
 	"github.com/jackc/pgx/v5"
 
 )
@@ -77,23 +76,7 @@ func CreateURL(c *fiber.Ctx) error {
 		return api.RespondWithError(c, fiber.StatusInternalServerError, "Failed to save URL")
 	}
 
-	hoursInt, err := strconv.Atoi(body.ExpiresAt)
-	if err != nil {
-		log.Fatalf("Invalid ExpiresAt value: %v", err)
-	}
-
-	delay := time.Duration(hoursInt) * time.Hour
-
-	asynqClient := config.AsynqClient
-
-	task, err := jobs.NewDeleteTask(urlId.String())
-	if err != nil {
-		return fiber.ErrInternalServerError
-	}
-	if _, err := asynqClient.Enqueue(task, asynq.ProcessIn(delay)); err != nil {
-		log.Fatal(err)
-		return fiber.ErrInternalServerError
-	}
+	queue.PublishJob(urlId.String(), float64(hours))
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status": 200,
