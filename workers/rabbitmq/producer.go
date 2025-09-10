@@ -21,7 +21,7 @@ func PublishJob(urlID string, hours float64) {
 
 	err := config.RabbitMQChannel.Publish(
 		"delayed-exchange",
-		"job_key",
+		"job_key", // in your project, you can rename this. just ensure it matches what y've in your consumer.go.
 		false,
 		false,
 		amqp.Publishing{

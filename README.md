@@ -2,7 +2,7 @@
 
 ### Introduction
 
-This is a RESTful API built using Golang, Fiber, MongoDB, Redis, Async and Reflex. This API provides a simple implementation to scheduling jobs in golang.
+This is a RESTful API built using Golang, Fiber, Postgresql, RabbitMQ, Async and Reflex. This API provides a simple implementation to scheduling jobs in golang.
 </br>
 
 ### Setup
@@ -13,7 +13,7 @@ Clone the repository to your local machine.
 git clone https://github.com/dipo0x/url-shortener
 ```
 
-Ensure that you have Golang, Redis and MongoDB installed on your machine. Alternatively, you can use MongoDB Cloud Atlas and Redis cloud service
+Ensure that you have Golang, Postgresql and RabbitMQ installed on your machine. Alternatively, you can use their cloud service.
 
 Navigate to the root directory of the project in a terminal.
 
@@ -37,10 +37,11 @@ bash build/scripts/setup.sh
 
 #### Locally
 
-Run the following command to start the server:
+Run the following command to start the server and start up rabbitmq instance:
 
 ```bash
 reflex -c .reflex
+go run cmd/worker/main.go
 ```
 
 Run the following command to view your redis jobs details on a dashboard:

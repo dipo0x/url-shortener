@@ -30,9 +30,9 @@ func StartConsumer() {
 	err := ch.ExchangeDeclare(
 		"delayed-exchange", 
 		"x-delayed-message", 
-		true,  
-		false,  
-		false, 
+		true,
+		false,
+		false,
 		false,  
 		args,   
 	)
