@@ -44,11 +44,6 @@ reflex -c .reflex
 go run cmd/worker/main.go
 ```
 
-Run the following command to view your redis jobs details on a dashboard:
-
-```bash
-asynqmon --redis-addr=localhost:6379
-```
 <img width="612" alt="Screenshot 2025-05-10 at 11 17 00 PM" src="https://github.com/user-attachments/assets/56d6a976-d511-459a-abc4-919605b575db" />
 
 and when you run your asynqmon start command, you will see this:
