@@ -2,6 +2,7 @@ package queue
 
 import (
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/dipo0x/golang-url-shortener/internal/config"
@@ -13,21 +14,35 @@ func PublishJob(urlID string, hours float64) {
 	if config.RabbitMQChannel == nil {
 		log.Fatal("RabbitMQ channel is not initialized")
 	}
+	delayQueueArgs := amqp.Table{
+		"x-dead-letter-exchange": "delayed-exchange",
+		"x-dead-letter-routing-key": "job_key",
+	}
+
+	_, err := config.RabbitMQChannel.QueueDeclare(
+		"delay_queue",
+		true,
+		false,
+		false,
+		false,
+		delayQueueArgs,
+	)
+	infra.FailOnError(err, "Failed to declare delay queue")
 
 	duration := time.Duration(hours * float64(time.Hour))
-	headers := amqp.Table{"x-delay": duration.Milliseconds()}
+	expiration := strconv.FormatInt(duration.Milliseconds(), 10)
 
 	body := "deleteOldUrl:" + urlID
 
-	err := config.RabbitMQChannel.Publish(
-		"delayed-exchange",
-		"job_key", // in your project, you can rename this. just ensure it matches what y've in your consumer.go.
+	err = config.RabbitMQChannel.Publish(
+		"", // default exchange routes to queue by name
+		"delay_queue",
 		false,
 		false,
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(body),
-			Headers:     headers,
+			Expiration:  expiration,
 		},
 	)
 	infra.FailOnError(err, "Failed to publish job")

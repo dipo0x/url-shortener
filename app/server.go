@@ -17,7 +17,7 @@ func InitializeApp() *fiber.App {
 	routes.IndexRoutes(api.Group("/index"))
 	routes.URLRoutes(api.Group("/url"))
 
-	config.InitializeRabbitMQ(config.Config("RABBITMQ_URL"))
+	config.InitializeRabbitMQ(config.Config("RABBIT_MQ_URL"))
 	err := config.InitializeDB(config.Config("DATABASE_URL"))
 	
 	if err != nil {

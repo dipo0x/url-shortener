@@ -6,16 +6,16 @@ import (
 	"log"
 
 	"time"
+
 	"github.com/dipo0x/golang-url-shortener/api"
 	"github.com/dipo0x/golang-url-shortener/helpers"
 	"github.com/dipo0x/golang-url-shortener/internal/config"
 	"github.com/dipo0x/golang-url-shortener/internal/models"
 	"github.com/dipo0x/golang-url-shortener/internal/types"
-	"github.com/dipo0x/golang-url-shortener/workers/rabbitmq"
+	queue "github.com/dipo0x/golang-url-shortener/workers/rabbitmq"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-
 )
 
 var ctx = context.Background()
@@ -59,10 +59,10 @@ func CreateURL(c *fiber.Ctx) error {
 	var savedURL models.URL
 
 	err = config.Pool.QueryRow(ctx, `
-    INSERT INTO urls (url, short_url, clicks, expires_at)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id, url, short_url, clicks, expires_at, created_at, updated_at
-`, body.URL, shortURL, 0, time.Now().Add(hours)).Scan(
+	INSERT INTO urls (id, url, short_url, clicks, expires_at)
+	VALUES ($1, $2, $3, $4, $5)
+	RETURNING id, url, short_url, clicks, expires_at, created_at, updated_at
+`, urlId, body.URL, shortURL, 0, time.Now().Add(hours)).Scan(
     &savedURL.ID,
     &savedURL.URL,
     &savedURL.ShortURL,

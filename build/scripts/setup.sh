@@ -17,9 +17,9 @@ echo "Enter url absolute link (default: http://localhost:8080/url):"
 read -r URL_ABSOLUTE_URL
 URL_ABSOLUTE_URL=${URL_ABSOLUTE_URL:-http://localhost:8080/url}
 
-echo "Enter redis url (default: localhost:6379):"
-read -r REDIS_URL
-REDIS_URL=${REDIS_URL:-localhost:6379}
+echo "Enter rabbitmq url (default: localhost:6379):"
+read -r RABBIT_MQ_URL
+RABBIT_MQ_URL=${RABBIT_MQ_URL:-localhost:6379}
 
 # Create the .env file
 cat <<EOF > .env
@@ -27,7 +27,7 @@ PORT=$PORT
 DATABASE_URL=$DATABASE_URL
 JWT_SECRET_KEY=$JWT_SECRET_KEY
 URL_ABSOLUTE_URL=$URL_ABSOLUTE_URL
-REDIS_URL=$REDIS_URL
+RABBIT_MQ_URL=$RABBIT_MQ_URL
 EOF
 
 echo ".env file created successfully."

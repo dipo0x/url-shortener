@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/dipo0x/golang-url-shortener/internal/config"
 	"github.com/dipo0x/golang-url-shortener/internal/infra"
 )
@@ -15,26 +14,33 @@ import (
 var ctx = context.Background()
 
 func deleteURL(urlID string) {
-	_, err := config.Pool.Exec(ctx, `DELETE FROM urls WHERE id = $1`, urlID)
+	urlID = strings.TrimSpace(urlID)
+
+	tag, err := config.Pool.Exec(ctx, `DELETE FROM urls WHERE id = $1`, urlID)
 	if err != nil {
 		log.Printf("Failed to delete URL %s: %v", urlID, err)
 		return
 	}
+
+	if tag.RowsAffected() == 0 {
+		log.Printf("No URL found to delete with id %s (0 rows affected)", urlID)
+		return
+	}
+
 	log.Printf("URL deleted: %s", urlID)
 }
 
 func StartConsumer() {
 	ch := config.RabbitMQChannel
 
-	args := amqp.Table{"x-delayed-type": "direct"}
 	err := ch.ExchangeDeclare(
-		"delayed-exchange", 
-		"x-delayed-message", 
+		"delayed-exchange",
+		"direct",
 		true,
 		false,
 		false,
-		false,  
-		args,   
+		false,
+		nil,
 	)
 	infra.FailOnError(err, "Failed to declare exchange")
 
@@ -67,7 +73,6 @@ func StartConsumer() {
 
 	log.Printf("Waiting for jobs...")
 
-	// Graceful shutdown
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	config.InitializeRabbitMQ(config.Config("RABBITMQ_URL"))
+	config.InitializeRabbitMQ(config.Config("RABBIT_MQ_URL"))
 
 	if err := config.InitializeDB(config.Config("DATABASE_URL")); err != nil {
 		log.Fatalf("DB init failed: %v", err)
