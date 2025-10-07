@@ -2,7 +2,7 @@
 
 ### Introduction
 
-This is a RESTful API built using Golang, Fiber, Postgresql, RabbitMQ, Async and Reflex. This API provides a simple implementation to scheduling jobs in golang.
+This is a RESTful API built using Golang, Fiber, Postgresql, RabbitMQ and Reflex. This API provides a simple implementation for scheduling jobs in Go.
 </br>
 
 ### Setup
@@ -13,7 +13,7 @@ Clone the repository to your local machine.
 git clone https://github.com/dipo0x/url-shortener
 ```
 
-Ensure that you have Golang, Postgresql and RabbitMQ installed on your machine. Alternatively, you can use their cloud service.
+Ensure that you have Golang, PostgreSQL and RabbitMQ installed on your machine. Alternatively, you can use their cloud service.
 
 Navigate to the root directory of the project in a terminal.
 
@@ -27,10 +27,19 @@ Run the following command to install the necessary dependencies
 go install
 ```
 
-After that, run this command to create a .env file with which you can get started with.
+After that, run this command to create a .env file with which you can get started.
 
 ```bash
 bash build/scripts/setup.sh
+```
+After that, run this command to install migrate on your cmd so that you can create a migration for your models
+
+```
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+Once the installation is successful, run this command to run the create table migration
+```
+make migrate-up
 ```
 
 ### Running Server
@@ -43,15 +52,15 @@ Run the following command to start the server and start up rabbitmq instance:
 reflex -c .reflex
 go run cmd/worker/main.go
 ```
+For clarity sake, the first command spins up your development server while the second one spins up the RabbitMQ receiver. When you run the first command, you will see something similar to this:
+<img width="425" height="196" alt="Screenshot 2025-10-08 at 12 39 14 AM" src="https://github.com/user-attachments/assets/e0958862-dbeb-486b-868b-17e1c668f2ed" />
 
-<img width="612" alt="Screenshot 2025-05-10 at 11 17 00 PM" src="https://github.com/user-attachments/assets/56d6a976-d511-459a-abc4-919605b575db" />
 
-and when you run your asynqmon start command, you will see this:
+When you run the second command, you will see something similar to this:
 </br>
-<img width="470" alt="Screenshot 2025-05-10 at 11 19 39 PM" src="https://github.com/user-attachments/assets/b430595e-83a0-4d78-a541-f9c3aa7de20f" />
 
-
-
+<img width="444" height="197" alt="Screenshot 2025-10-08 at 12 39 20 AM" src="https://github.com/user-attachments/assets/14dbb222-fb0f-425f-99ee-aaba55c8dd73" />
+</br>
 The server will run on http://localhost:8080 by default
 
 </br>
@@ -63,13 +72,12 @@ go test ./tests/
 ```
 If all your tests are successful, you will see this: 
 </br>
-<img width="398" alt="Screenshot 2025-05-11 at 5 47 47 PM" src="https://github.com/user-attachments/assets/f5da7bff-1351-48d0-9931-d65ec361085e" />
+<img width="312" height="59" alt="Screenshot 2025-10-08 at 12 43 32 AM" src="https://github.com/user-attachments/assets/22e99388-db8d-452c-b59e-bc21d3792664" />
 
 </br>
 else, you will see something similar to this:
 </br>
 <img width="418" alt="Screenshot 2025-05-11 at 5 47 01 PM" src="https://github.com/user-attachments/assets/63ccc3cc-cf5b-46f5-a383-c02c1d8c9e24" />
-
 
 
 ## Available Endpoints
